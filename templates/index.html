@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Marketplace Review Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        .progress-bar {
+            transition: width 0.6s ease;
+        }
+        .review-flagged {
+            background-color: #ffe0e0;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+  <h1>DeepLearning Model & GenAI Reviews Filtering Demo</h1>
+  <div class="mb-3">
+    <label for="csvFile" class="form-label">Import Reviews for Product(s)</label>
+    <input type="file" id="csvFile" accept=".csv" class="form-control mb-2">
+    <button class="btn btn-info" onclick="importCSV()">Import CSV</button>
+    <span id="csvStatus" class="ms-3"></span>
+  </div>
+  <div id="uninitialized"></div>
+  <div id="products"></div>
+</div>
+
+<!-- Modal for filling product info -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalLabel">Initialize Product Info</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="modalAsin" name="asin">
+          <div class="mb-3">
+            <label for="title" class="form-label">Product Title (Required)</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="image_link" class="form-label">Image Link</label>
+            <input type="text" class="form-control" id="image_link" name="image_link">
+          </div>
+          <div class="mb-3">
+            <label for="seller" class="form-label">Seller</label>
+            <input type="text" class="form-control" id="seller" name="seller">
+          </div>
+          <div class="mb-3">
+            <label for="length" class="form-label">Number of Reviews</label>
+            <input disabled type="number" class="form-control" id="length" name="length" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button type="button" class="btn btn-outline-danger" onclick="deleteFromModal()">Delete Product & Reviews</button>
+          <small class="text-muted">Removes product (if exists) and all reviews for this ASIN.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const productsDiv = document.getElementById('products');
+let products = [];
+let uninitialized = [];
+
+function fetchProducts() {
+    fetch('/allProducts')
+        .then(res => res.json())
+        .then(data => {
+            products = data;
+            renderProducts();
+        });
+    fetch('/uninitializedAsins')
+        .then(res => res.json())
+        .then(data => {
+            uninitialized = data;
+            renderUninitialized();
+        });
+}
+
+function renderProducts() {
+    let html = '<h2>Manage Products</h2>';
+    if (!products.length) {
+        html += '<h3>No products found.</h3>';
+    } else {
+        html += '<div class="row">';
+        products.forEach(prod => {
+            html += `<div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="${prod.image_link || '/static/no_image.jpg'}" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">${prod.title || prod.asin}</h5>
+                        <p class="card-text">Seller: ${prod.seller || 'N/A'}</p>
+                        <p class="card-text">ASIN: ${prod.asin}</p>
+                        <p class="card-text">Reviews: ${prod.length || 0}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>${productStatusLabel(prod)}</span>
+                            <div>
+                                ${prod.check_flag === 0 ? `<button class="btn btn-warning btn-sm me-1" onclick="startModelCheck('${prod.asin}')">Start Model Check</button>` : prod.check_flag === 2 ? `<button class="btn btn-success btn-sm me-1" onclick="startGenAICheck('${prod.asin}')">Start GenAI Check</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="mb-2">${(prod.check_flag === 1 || prod.check_flag === 3) ? renderProgress(prod) : ''}</div>
+                        <div style="margin-bottom: 20px;"></div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewReviews('${prod.asin}', 'all')">All Reviews</button>
+                        <!-- Show viewReviews('{prod.asin}', 'model') only if prod.check_flag > 1 -->
+                        ${prod.check_flag > 1 ? `<button class="btn btn-outline-success btn-sm" onclick="viewReviews('${prod.asin}', 'model')">Filtered</button>` : ''}
+                        <button class="btn btn-outline-danger btn-sm float-end" onclick="deleteProduct('${prod.asin}')">Delete Product</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    }
+    productsDiv.innerHTML = html;
+}
+
+function productStatusLabel(prod) {
+    switch(prod.check_flag) {
+        case 0: return 'Not checked';
+        case 1: return `Model checking... ${prod.num_checked}/${prod.num_total}`;
+        case 2: return 'Model check done, ready for GenAI check';
+        case 3: return `GenAI checking... ${prod.num_checked}/${prod.num_total}`;
+        case 4: return 'GenAI check done, ready for user review';
+        case 5: return 'All checks done';
+        default: return 'Unknown';
+    }
+}
+
+function startModelCheck(asin) {
+    // Disable button immediately
+    document.querySelector(`button[onclick="startModelCheck('${asin}')"]`).disabled = true;
+    fetch(`/modelCheck/${encodeURIComponent(asin)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'Model is checking...') {
+                setTimeout(() => fetchProducts(), 2000);
+            } else {
+                alert('Failed to start model check: ' + (data.error || 'Unknown error'));
+            }
+        });
+}
+
+function startGenAICheck(asin) {
+    document.querySelector(`button[onclick="startGenAICheck('${asin}')"]`).disabled = true;
+    fetch(`/genAiCheck/${encodeURIComponent(asin)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'groq checking...') {
+                setTimeout(() => fetchProducts(), 2000);
+            } else {
+                alert('Failed to start GenAI check: ' + (data.error || 'Unknown error'));
+            }
+        });
+}
+
+function renderProgress(prod) {
+    let status = prod.check_flag;
+    let progress = 0;
+    let label = '';
+    progress = (prod.num_checked / prod.num_total * 100).toFixed(2);
+    return `<div class="progress">
+        <div class="progress-bar" role="progressbar" style="width: ${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">${label}</div>
+    </div>`;
+}
+// Auto-refresh progress for products that are currently being checked
+
+function renderUninitialized() {
+    // Clear previous
+    document.getElementById('uninitialized').innerHTML = '';
+    if (!uninitialized.length) return;
+    let html = '<h2>Uninitialized ASINs</h2><ul class="list-group mb-4">';
+    uninitialized.forEach(item => {
+        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+            Product ASIN: ${item.asin} <span class="badge bg-secondary">${item.review_count} reviews</span>
+            <button class="btn btn-sm btn-primary" onclick="showProductModal('${item.asin}', ${item.review_count})">Initialize Product</button>
+        </li>`;
+    });
+    html += '</ul>';
+    document.getElementById('uninitialized').innerHTML = html;
+}
+
+function showProductModal(asin, length) {
+    document.getElementById('modalAsin').value = asin;
+    document.getElementById('length').value = length;
+    document.getElementById('image_link').value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('seller').value = '';
+    let modal = new bootstrap.Modal(document.getElementById('productModal'));
+    modal.show();
+}
+
+document.getElementById('productForm').onsubmit = function(e) {
+    e.preventDefault();
+    let asin = document.getElementById('modalAsin').value;
+    let image_link = document.getElementById('image_link').value;
+    let title = document.getElementById('title').value;
+    let seller = document.getElementById('seller').value;
+    let length = document.getElementById('length').value;
+    fetch('/initProduct', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({asin, image_link, title, seller, length})
+    }).then(res => res.json()).then(data => {
+        if (data.status === 'ok') {
+            bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+            fetchProducts();
+            document.getElementById('productForm').reset();
+            // Reload uninitialized ASINs
+            fetch('/uninitializedAsins')
+                .then(res => res.json())
+                .then(data => {
+                    uninitialized = data;
+                    renderUninitialized();
+                });
+        } else {
+            alert('Failed to initialize product: ' + (data.error || 'Unknown error'));
+        }
+    });
+};
+
+function viewReviews(asin, filter) {
+    if (filter === undefined) filter = 'all';
+    if (filter !== 'all' && filter !== 'model' && filter !== 'genai') {
+        alert('Invalid filter type.');
+        return;
+    }
+    let url = '';
+    if (filter === 'all') {
+        url = `/allReviews/${asin}`;
+    }else if (filter === 'model') {
+        url = `/modelFlag2Reviews/${asin}`;
+    } else if (filter === 'genai') {
+        url = `/genaiFlag2Reviews/${asin}`;
+    }
+        
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let reviews = data;
+            // Descending order by user_flag, then model_flag, then genai_flag
+            reviews.sort((a, b) => {
+                if (b.user_flag !== a.user_flag) return b.user_flag - a.user_flag;
+                if (b.model_flag !== a.model_flag) return b.model_flag - a.model_flag;
+                return b.genai_flag - a.genai_flag;
+            });
+            showReviewsModal(asin, reviews);
+        });
+}
+
+function showReviewsModal(asin, reviews) {
+    let html = `<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="reviewsModalLabel">Reviews for ASIN ${asin}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-bordered table-responsive">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">Reviewer</th>
+                  <th style="width: 20%; word-wrap: break-word;">Summary</th>
+                  <th style="width: 30%; word-wrap: break-word;">Text</th>
+                  <th style="width: 8%;">Rate</th>
+                  <th style="width: 8%;">Model</th>
+                  <th style="width: 8%;">GenAI</th>
+                  <th style="width: 8%;">User</th>
+                  <th style="width: 8%;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${reviews.map(r => `<tr${(r.model_flag === 2 && r.genai_flag === 2) ? ' class="review-flagged"' : ''}>
+                  <td style="word-wrap: break-word; max-width: 100px;">${r.reviewerName}</td>
+                  <td style="word-wrap: break-word; max-width: 150px;">${r.summary}</td>
+                  <td style="word-wrap: break-word; max-width: 200px;">${r.reviewText}</td>
+                  <td>${r.overall}</td>
+                  <td>${r.model_flag === 0 ? 'N/A' : r.model_flag === 1 ? 'Pass' : 'Fail'}</td>
+                  <td>${r.genai_flag === 0 ? 'N/A' : r.genai_flag === 1 ? 'Pass' : 'Fail'}</td>
+                  <td>${r.user_flag === 0 ? 'N/A' : r.user_flag === 1 ? 'Showing' : 'Hidden'}</td>
+                  <td style="white-space: nowrap;">${(r.model_flag === 2 && r.genai_flag === 2) ? `<button class='btn btn-danger btn-sm' onclick='flagReview("${r.uuid}", 1)'>Flag as Wrong</button> <button class='btn btn-secondary btn-sm' onclick='flagReview("${r.uuid}", 0)'>Unflag</button>` : ''}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    let modalDiv = document.createElement('div');
+    modalDiv.innerHTML = html;
+    document.body.appendChild(modalDiv);
+    let modal = new bootstrap.Modal(modalDiv.querySelector('#reviewsModal'));
+    modal.show();
+    modalDiv.querySelector('#reviewsModal').addEventListener('hidden.bs.modal', function () {
+        document.body.removeChild(modalDiv);
+    });
+}
+
+function flagReview(uuid, flag) {
+    fetch(`/userFlag/${uuid}/${flag}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'flagged') {
+                alert('Review flagged!');
+            }
+        });
+}
+
+window.onload = fetchProducts;
+
+function importCSV() {
+  const fileInput = document.getElementById('csvFile');
+  const statusSpan = document.getElementById('csvStatus');
+  if (!fileInput.files.length) {
+    statusSpan.textContent = 'Please select a CSV file.';
+    statusSpan.className = 'text-danger ms-3';
+    return;
+  }
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append('file', file);
+  statusSpan.textContent = 'Uploading...';
+  statusSpan.className = 'text-warning ms-3';
+  fetch('/loadCSV', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.inserted) {
+      statusSpan.textContent = `Imported ${data.inserted} reviews.`;
+      statusSpan.className = 'text-success ms-3';
+      fetchProducts();
+    } else if (data.error) {
+      statusSpan.textContent = `Error: ${data.error}`;
+      statusSpan.className = 'text-danger ms-3';
+    } else {
+      statusSpan.textContent = 'Unknown response.';
+      statusSpan.className = 'text-danger ms-3';
+    }
+  })
+  .catch(err => {
+    statusSpan.textContent = 'Upload failed.';
+    statusSpan.className = 'text-danger ms-3';
+  });
+}
+
+function deleteFromModal() {
+  const asin = document.getElementById('modalAsin').value;
+  deleteProduct(asin, true);
+}
+
+function deleteProduct(asin, hideModal=false) {
+  if (!asin) return;
+  if (!confirm(`Delete product ${asin} and all its reviews? This cannot be undone.`)) return;
+  fetch(`/deleteProduct/${encodeURIComponent(asin)}`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'deleted') {
+        if (hideModal) {
+          const modalEl = document.getElementById('productModal');
+          const instance = bootstrap.Modal.getInstance(modalEl);
+          if (instance) instance.hide();
+        }
+        // Refresh both lists
+        fetchProducts();
+      } else {
+        alert('Failed to delete: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(err => {alert('Delete failed.'); console.error(err)});
+}
+
+setInterval(function() {
+    // Only refresh if there are products currently being checked (check_flag 1 or 3)
+    const hasActiveChecks = products.some(prod => prod.check_flag === 1 || prod.check_flag === 3);
+    if (hasActiveChecks) {
+        fetchProducts();
+    }
+}, 2000); // Refresh every 2 seconds
+</script>
+</body>
+</html>
