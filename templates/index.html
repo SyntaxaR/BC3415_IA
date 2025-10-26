@@ -2,62 +2,1008 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Marketplace Review Demo</title>
+    <title>BC3415 IA | Review Demo</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #f8fafc;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            margin: 2rem auto;
+            max-width: 1400px;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="25" cy="75" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-section .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .upload-section h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: var(--secondary-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+            background: white;
+        }
+
+        .btn {
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            text-transform: none;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #3730a3 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline-success {
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            background: transparent;
+        }
+
+        .btn-outline-success:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-outline-danger {
+            border: 2px solid var(--danger-color);
+            color: var(--danger-color);
+            background: transparent;
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
         .progress-bar {
             transition: width 0.6s ease;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #059669 100%);
+            border-radius: 8px;
         }
+
+        .progress {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            height: 12px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
         .review-flagged {
-            background-color: #ffe0e0;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-not-checked {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .status-checking {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-done {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 2px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .product-image-container {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: var(--secondary-color);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-card-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .status-section {
+            margin-bottom: 1rem;
+        }
+
+        .progress-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .action-buttons {
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .review-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        .review-btn {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            grid-column: span 2;
+        }
+
+        .status-not-checked {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .status-checking {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-done {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .uninitialized-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .uninitialized-item {
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .uninitialized-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .uninitialized-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .uninitialized-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .uninitialized-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .uninitialized-asin {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .review-count-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem 2rem;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:disabled {
+            background-color: var(--secondary-color);
+            border-color: var(--border-color);
+            opacity: 0.8;
+        }
+
+        .modal-footer-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+        }
+
+        .delete-warning {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Reviews Modal Styles */
+        .reviews-table {
+            font-size: 0.875rem;
+        }
+
+        .reviews-table th {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 0.5rem;
+            vertical-align: middle;
+        }
+
+        .reviews-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 0.5rem;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .reviews-table .review-flagged {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .flag-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            margin-right: 0.25rem;
+        }
+
+        .btn-sm.flag-btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-badge.pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.na {
+            background: var(--secondary-color);
+            color: var(--text-secondary);
+        }
+
+        /* Animations and Transitions */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .main-container {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .product-card {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Disable animations during refresh */
+        .no-animations .product-card {
+            animation: none !important;
+        }
+
+        .no-animations .uninitialized-item {
+            animation: none !important;
+        }
+
+        .uninitialized-item {
+            animation: slideInRight 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .upload-section {
+            animation: fadeInUp 0.6s ease-out;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .status-checking .fas.fa-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .btn:active {
+            transform: translateY(0px) scale(0.98);
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, var(--accent-color), #34d399, var(--accent-color), #34d399);
+            background-size: 200% 200%;
+            animation: gradient-shift 2s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .form-control:focus {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        .modal.fade .modal-dialog {
+            transform: scale(0.8) translateY(-50px);
+            transition: all 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Loading states */
+        .btn:disabled {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn:disabled::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            color: white;
+        }
+
+        /* Hover effects */
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .status-indicator:hover {
+            transform: scale(1.05);
+        }
+
+        .product-image-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .product-image-container::after {
+            transform: translateX(100%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+            
+            .header-section h1 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 0.5rem;
+                border-radius: 12px;
+            }
+            
+            .header-section {
+                padding: 1.5rem 1rem;
+                text-align: center;
+            }
+            
+            .header-section h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .header-section .subtitle {
+                font-size: 1rem;
+            }
+            
+            .content-section {
+                padding: 1rem;
+            }
+            
+            .upload-section {
+                padding: 1.5rem;
+            }
+            
+            .product-card-body {
+                padding: 1rem;
+            }
+            
+            .review-buttons {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .delete-btn {
+                grid-column: span 1;
+            }
+            
+            .uninitialized-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .uninitialized-info {
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .modal-dialog.modal-xl {
+                max-width: calc(100vw - 1rem);
+            }
+            
+            .reviews-table {
+                font-size: 0.75rem;
+            }
+            
+            .reviews-table th,
+            .reviews-table td {
+                padding: 0.5rem 0.25rem;
+            }
+            
+            .flag-btn {
+                padding: 0.125rem 0.25rem;
+                font-size: 0.625rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-section h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header-section .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .section-title::before {
+                width: 100%;
+                height: 3px;
+            }
+            
+            .product-image-container {
+                height: 180px;
+            }
+            
+            .upload-section h3 {
+                font-size: 1.1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .action-btn,
+            .review-btn {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .status-indicator {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
+            .product-title {
+                font-size: 1.1rem;
+                -webkit-line-clamp: 3;
+                line-clamp: 3;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .main-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            
+            .header-section {
+                background: #f8f9fa !important;
+                color: black !important;
+            }
+            
+            .btn {
+                display: none;
+            }
+            
+            .modal {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container mt-4">
-  <h1>DeepLearning Model & GenAI Reviews Filtering Demo</h1>
-  <div class="mb-3">
-    <label for="csvFile" class="form-label">Import Reviews for Product(s)</label>
-    <input type="file" id="csvFile" accept=".csv" class="form-control mb-2">
-    <button class="btn btn-info" onclick="importCSV()">Import CSV</button>
-    <span id="csvStatus" class="ms-3"></span>
+<div class="main-container">
+  <div class="header-section">
+    <h1><i class="fas fa-brain me-3"></i>AI Marketplace Review Analytics</h1>
+    <p class="subtitle">Advanced AI-powered review filtering and analysis system</p>
   </div>
-  <div id="uninitialized"></div>
-  <div id="products"></div>
+  
+  <div class="content-section">
+    <div class="upload-section">
+      <h3><i class="fas fa-upload"></i>Import Product Reviews</h3>
+      <div class="row align-items-end">
+        <div class="col-md-8">
+          <label for="csvFile" class="form-label">Select CSV file containing product reviews</label>
+          <input type="file" id="csvFile" accept=".csv" class="form-control mb-2">
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-info w-100" onclick="importCSV()">
+            <i class="fas fa-file-upload me-2"></i>Import CSV
+          </button>
+        </div>
+      </div>
+      <div class="mt-3">
+        <span id="csvStatus" class="status-indicator"></span>
+      </div>
+    </div>
+    
+    <div id="uninitialized"></div>
+    <div id="products"></div>
+  </div>
 </div>
 
 <!-- Modal for filling product info -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="productModalLabel">Initialize Product Info</h5>
+        <h5 class="modal-title" id="productModalLabel">
+          <i class="fas fa-plus-circle me-2"></i>Initialize Product Information
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="productForm">
           <input type="hidden" id="modalAsin" name="asin">
-          <div class="mb-3">
-            <label for="title" class="form-label">Product Title (Required)</label>
-            <input type="text" class="form-control" id="title" name="title" required>
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label for="title" class="form-label">
+                <i class="fas fa-tag me-2"></i>Product Title <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" id="title" name="title" required 
+                     placeholder="Enter the product title...">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label for="image_link" class="form-label">
+                <i class="fas fa-image me-2"></i>Product Image URL
+              </label>
+              <input type="url" class="form-control" id="image_link" name="image_link" 
+                     placeholder="https://example.com/product-image.jpg">
+            </div>
+            <div class="col-md-8 mb-3">
+              <label for="seller" class="form-label">
+                <i class="fas fa-store me-2"></i>Seller Name
+              </label>
+              <input type="text" class="form-control" id="seller" name="seller" 
+                     placeholder="Enter seller name...">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="length" class="form-label">
+                <i class="fas fa-star me-2"></i>Review Count
+              </label>
+              <input disabled type="number" class="form-control" id="length" name="length" required>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="image_link" class="form-label">Image Link</label>
-            <input type="text" class="form-control" id="image_link" name="image_link">
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Save Product Information
+            </button>
           </div>
-          <div class="mb-3">
-            <label for="seller" class="form-label">Seller</label>
-            <input type="text" class="form-control" id="seller" name="seller">
-          </div>
-          <div class="mb-3">
-            <label for="length" class="form-label">Number of Reviews</label>
-            <input disabled type="number" class="form-control" id="length" name="length" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Save</button>
         </form>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <button type="button" class="btn btn-outline-danger" onclick="deleteFromModal()">Delete Product & Reviews</button>
-          <small class="text-muted">Removes product (if exists) and all reviews for this ASIN.</small>
+        <div class="modal-footer-custom">
+          <button type="button" class="btn btn-outline-danger" style="margin-right: 20px;" onclick="deleteFromModal()">
+            <i class="fas fa-trash me-2"></i>Delete Product & Reviews
+          </button>
+          <div class="delete-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>This will permanently remove the product and all associated reviews</span>
+          </div>
         </div>
       </div>
     </div>
@@ -69,8 +1015,10 @@
 const productsDiv = document.getElementById('products');
 let products = [];
 let uninitialized = [];
+let isRefreshing = false; // Track if we're in a refresh cycle
 
-function fetchProducts() {
+function fetchProducts(skipAnimations = false) {
+    isRefreshing = skipAnimations;
     fetch('/allProducts')
         .then(res => res.json())
         .then(data => {
@@ -86,32 +1034,69 @@ function fetchProducts() {
 }
 
 function renderProducts() {
-    let html = '<h2>Manage Products</h2>';
+    const containerClass = isRefreshing ? 'no-animations' : '';
+    let html = '<h2 class="section-title"><i class="fas fa-store"></i>Product Management</h2>';
     if (!products.length) {
-        html += '<h3>No products found.</h3>';
+        html += `<div class="empty-state">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <h3 class="text-muted">No products found</h3>
+            <p class="text-muted">Import some CSV files to get started with product analysis</p>
+        </div>`;
     } else {
-        html += '<div class="row">';
+        html += `<div class="row g-4 ${containerClass}">`;
         products.forEach(prod => {
-            html += `<div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="${prod.image_link || '/static/no_image.jpg'}" class="card-img-top" alt="Product Image">
-                    <div class="card-body">
-                        <h5 class="card-title">${prod.title || prod.asin}</h5>
-                        <p class="card-text">Seller: ${prod.seller || 'N/A'}</p>
-                        <p class="card-text">ASIN: ${prod.asin}</p>
-                        <p class="card-text">Reviews: ${prod.length || 0}</p>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>${productStatusLabel(prod)}</span>
-                            <div>
-                                ${prod.check_flag === 0 ? `<button class="btn btn-warning btn-sm me-1" onclick="startModelCheck('${prod.asin}')">Start Model Check</button>` : prod.check_flag === 2 ? `<button class="btn btn-success btn-sm me-1" onclick="startGenAICheck('${prod.asin}')">Start GenAI Check</button>` : ''}
+            html += `<div class="col-xl-4 col-lg-6 col-md-12">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="${prod.image_link || '/static/no_image.jpg'}" class="product-image" alt="Product Image">
+                        <div class="product-status-badge ${getStatusClass(prod.check_flag)}">${getStatusIcon(prod.check_flag)}</div>
+                    </div>
+                    <div class="product-card-body">
+                        <h5 class="product-title">${prod.title || prod.asin}</h5>
+                        <div class="product-details">
+                            <div class="detail-item">
+                                <i class="fas fa-store text-muted"></i>
+                                <span>${prod.seller || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tag text-muted"></i>
+                                <span>${prod.asin}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-star text-muted"></i>
+                                <span>${prod.length || 0} reviews</span>
                             </div>
                         </div>
-                        <div class="mb-2">${(prod.check_flag === 1 || prod.check_flag === 3) ? renderProgress(prod) : ''}</div>
-                        <div style="margin-bottom: 20px;"></div>
-                        <button class="btn btn-outline-primary btn-sm" onclick="viewReviews('${prod.asin}', 'all')">All Reviews</button>
-                        <!-- Show viewReviews('{prod.asin}', 'model') only if prod.check_flag > 1 -->
-                        ${prod.check_flag > 1 ? `<button class="btn btn-outline-success btn-sm" onclick="viewReviews('${prod.asin}', 'model')">Filtered</button>` : ''}
-                        <button class="btn btn-outline-danger btn-sm float-end" onclick="deleteProduct('${prod.asin}')">Delete Product</button>
+                        
+                        <div class="status-section">
+                            <div class="status-indicator ${getStatusClass(prod.check_flag)}">
+                                ${getStatusIcon(prod.check_flag)}
+                                ${productStatusLabel(prod)}
+                            </div>
+                        </div>
+                        
+                        ${(prod.check_flag === 1 || prod.check_flag === 3) ? `<div class="progress-section">${renderProgress(prod)}</div>` : ''}
+                        
+                        <div class="action-buttons">
+                            ${prod.check_flag === 0 ? `<button class="btn btn-warning action-btn" onclick="startModelCheck('${prod.asin}')">
+                                <i class="fas fa-robot me-2"></i>Start Model Check
+                            </button>` : ''}
+                            ${prod.check_flag === 2 ? `<button class="btn btn-success action-btn" onclick="startGenAICheck('${prod.asin}')">
+                                <i class="fas fa-brain me-2"></i>Start GenAI Check
+                            </button>` : ''}
+                        </div>
+                        
+                        <div class="review-buttons">
+                            <button class="btn btn-outline-primary review-btn" onclick="viewReviews('${prod.asin}', 'all')">
+                                <i class="fas fa-list me-2"></i>All Reviews
+                            </button>
+                            ${prod.check_flag > 1 ? `<button class="btn btn-outline-success review-btn" onclick="viewReviews('${prod.asin}', 'model')">
+                                <i class="fas fa-filter me-2"></i>Filtered
+                            </button>` : ''}
+                            <button class="btn btn-outline-danger review-btn delete-btn" onclick="deleteProduct('${prod.asin}')">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -119,17 +1104,43 @@ function renderProducts() {
         html += '</div>';
     }
     productsDiv.innerHTML = html;
+    // Reset refresh state after rendering
+    isRefreshing = false;
 }
 
 function productStatusLabel(prod) {
     switch(prod.check_flag) {
         case 0: return 'Not checked';
         case 1: return `Model checking... ${prod.num_checked}/${prod.num_total}`;
-        case 2: return 'Model check done, ready for GenAI check';
+        case 2: return 'Ready for GenAI check';
         case 3: return `GenAI checking... ${prod.num_checked}/${prod.num_total}`;
-        case 4: return 'GenAI check done, ready for user review';
+        case 4: return 'Automatic checks done, pending review';
         case 5: return 'All checks done';
         default: return 'Unknown';
+    }
+}
+
+function getStatusClass(checkFlag) {
+    switch(checkFlag) {
+        case 0: return 'status-not-checked';
+        case 1: 
+        case 3: return 'status-checking';
+        case 2: return 'status-ready';
+        case 4:
+        case 5: return 'status-done';
+        default: return 'status-not-checked';
+    }
+}
+
+function getStatusIcon(checkFlag) {
+    switch(checkFlag) {
+        case 0: return '<i class="fas fa-clock"></i>';
+        case 1: 
+        case 3: return '<i class="fas fa-spinner fa-spin"></i>';
+        case 2: return '<i class="fas fa-play"></i>';
+        case 4:
+        case 5: return '<i class="fas fa-check"></i>';
+        default: return '<i class="fas fa-question"></i>';
     }
 }
 
@@ -175,14 +1186,28 @@ function renderUninitialized() {
     // Clear previous
     document.getElementById('uninitialized').innerHTML = '';
     if (!uninitialized.length) return;
-    let html = '<h2>Uninitialized ASINs</h2><ul class="list-group mb-4">';
+    
+    let html = `<div class="uninitialized-section">
+        <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i>Uninitialized Products</h2>`;
+    
     uninitialized.forEach(item => {
-        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-            Product ASIN: ${item.asin} <span class="badge bg-secondary">${item.review_count} reviews</span>
-            <button class="btn btn-sm btn-primary" onclick="showProductModal('${item.asin}', ${item.review_count})">Initialize Product</button>
-        </li>`;
+        html += `<div class="uninitialized-item">
+            <div class="uninitialized-content">
+                <div class="uninitialized-info">
+                    <div>
+                        <div class="uninitialized-asin">ASIN: ${item.asin}</div>
+                        <small class="text-muted">Requires product information to proceed</small>
+                    </div>
+                    <div class="review-count-badge">${item.review_count} reviews</div>
+                </div>
+                <button class="btn btn-primary" onclick="showProductModal('${item.asin}', ${item.review_count})">
+                    <i class="fas fa-plus me-2"></i>Initialize Product
+                </button>
+            </div>
+        </div>`;
     });
-    html += '</ul>';
+    
+    html += '</div>';
     document.getElementById('uninitialized').innerHTML = html;
 }
 
@@ -245,70 +1270,124 @@ function viewReviews(asin, filter) {
         .then(data => {
             let reviews = data;
             // Descending order by user_flag, then model_flag, then genai_flag
+            // Priority: for genai_flag desc, user_flag 0->2->1, model_flag desc
             reviews.sort((a, b) => {
-                if (b.user_flag !== a.user_flag) return b.user_flag - a.user_flag;
-                if (b.model_flag !== a.model_flag) return b.model_flag - a.model_flag;
-                return b.genai_flag - a.genai_flag;
+                if (b.genai_flag !== a.genai_flag) {
+                    return b.genai_flag - a.genai_flag;
+                }
+                if (a.user_flag !== b.user_flag) {
+                    if (a.user_flag === 0) return -1;
+                    if (b.user_flag === 0) return 1;
+                    return b.user_flag - a.user_flag;
+                }
+                return b.model_flag - a.model_flag;
             });
             showReviewsModal(asin, reviews);
         });
 }
 
 function showReviewsModal(asin, reviews) {
-    let html = `<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="reviewsModalLabel">Reviews for ASIN ${asin}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <table class="table table-bordered table-responsive">
-              <thead>
-                <tr>
-                  <th style="width: 10%;">Reviewer</th>
-                  <th style="width: 20%; word-wrap: break-word;">Summary</th>
-                  <th style="width: 30%; word-wrap: break-word;">Text</th>
-                  <th style="width: 8%;">Rate</th>
-                  <th style="width: 8%;">Model</th>
-                  <th style="width: 8%;">GenAI</th>
-                  <th style="width: 8%;">User</th>
-                  <th style="width: 8%;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${reviews.map(r => `<tr${(r.model_flag === 2 && r.genai_flag === 2) ? ' class="review-flagged"' : ''}>
-                  <td style="word-wrap: break-word; max-width: 100px;">${r.reviewerName}</td>
-                  <td style="word-wrap: break-word; max-width: 150px;">${r.summary}</td>
-                  <td style="word-wrap: break-word; max-width: 200px;">${r.reviewText}</td>
-                  <td>${r.overall}</td>
-                  <td>${r.model_flag === 0 ? 'N/A' : r.model_flag === 1 ? 'Pass' : 'Fail'}</td>
-                  <td>${r.genai_flag === 0 ? 'N/A' : r.genai_flag === 1 ? 'Pass' : 'Fail'}</td>
-                  <td>${r.user_flag === 0 ? 'N/A' : r.user_flag === 1 ? 'Showing' : 'Hidden'}</td>
-                  <td style="white-space: nowrap;">${(r.model_flag === 2 && r.genai_flag === 2) ? `<button class='btn btn-danger btn-sm' onclick='flagReview("${r.uuid}", 1)'>Flag as Wrong</button> <button class='btn btn-secondary btn-sm' onclick='flagReview("${r.uuid}", 0)'>Unflag</button>` : ''}</td>
-                </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
+  let html = `<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" style="max-width: 1800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reviewsModalLabel">
+          <i class="fas fa-comments me-2"></i>Reviews for ASIN ${asin}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table reviews-table">
+            <thead>
+            <tr>
+              <th style="width: 1%;">#</th>
+              <th style="width: 9%;">Reviewer</th>
+              <th style="width: 10%; word-wrap: break-word;">Summary</th>
+              <th style="width: 25%; word-wrap: break-word;">Review Text</th>
+              <th style="width: 8%;">Rating</th>
+              <th style="width: 8%;">Model Check</th>
+              <th style="width: 8%;">GenAI Check</th>
+              <th style="width: 15%;">GenAI Reason</th>
+              <th style="width: 8%;">User Status</th>
+              <th style="width: 8%;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${reviews.map(r => `<tr${(r.model_flag === 2 && r.genai_flag === 2) ? ' class="review-flagged"' : ''} id="review-${r.uuid}">
+              <td style="word-wrap: break-word; max-width: 50px;">${reviews.indexOf(r) + 1}</td>
+              <td style="word-wrap: break-word; max-width: 100px;">
+                <i class="fas fa-user-circle me-1"></i>${r.reviewerName}
+              </td>
+              <td style="word-wrap: break-word; max-width: 150px;">${r.summary}</td>
+              <td style="word-wrap: break-word; max-width: 200px;">${r.reviewText}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-star text-warning me-1"></i>${r.overall}
+                </div>
+              </td>
+              <td>
+                <span class="status-badge ${r.model_flag === 0 ? 'na' : r.model_flag === 1 ? 'pass' : 'fail'}">
+                  ${r.model_flag === 0 ? 'N/A' : r.model_flag === 1 ? 'Pass' : 'Fail'}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge ${r.genai_flag === 0 ? 'na' : r.genai_flag === 1 ? 'pass' : 'fail'}">
+                  ${r.genai_flag === 0 ? 'N/A' : r.genai_flag === 1 ? 'Pass' : 'Fail'}
+                </span>
+              </td>
+              <td style="word-wrap: break-word; max-width: 200px;">${r.genai_reason || '-'}</td>
+              <td id="user-flag-${r.uuid}">
+                <span class="status-badge ${r.user_flag === 0 ? 'na' : r.user_flag === 1 ? 'pass' : 'fail'}">
+                  ${r.user_flag === 0 ? 'N/A' : r.user_flag === 1 ? 'Showing' : 'Hidden'}
+                </span>
+              </td>
+              <td style="white-space: nowrap;" id="action-buttons-${r.uuid}">
+                ${(r.model_flag === 2 && r.genai_flag === 2 && r.user_flag === 0) ? `
+                  <button class='btn btn-danger flag-btn' onclick='flagReview("${r.uuid}", "${r.asin}", 2)' title="Flag as incorrect">
+                    <i class="fas fa-flag"></i>
+                  </button> 
+                  <button class='btn btn-secondary flag-btn' onclick='flagReview("${r.uuid}", "${r.asin}", 1)' title="Flag as correct">
+                    <i class="fas fa-check"></i>
+                  </button>
+                ` : '-'}
+              </td>
+            </tr>`).join('')}
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>`;
-    let modalDiv = document.createElement('div');
-    modalDiv.innerHTML = html;
-    document.body.appendChild(modalDiv);
-    let modal = new bootstrap.Modal(modalDiv.querySelector('#reviewsModal'));
-    modal.show();
-    modalDiv.querySelector('#reviewsModal').addEventListener('hidden.bs.modal', function () {
-        document.body.removeChild(modalDiv);
-    });
+    </div>
+    </div>
+  </div>`;
+  let modalDiv = document.createElement('div');
+  modalDiv.innerHTML = html;
+  document.body.appendChild(modalDiv);
+  let modal = new bootstrap.Modal(modalDiv.querySelector('#reviewsModal'));
+  modal.show();
+  modalDiv.querySelector('#reviewsModal').addEventListener('hidden.bs.modal', function () {
+    document.body.removeChild(modalDiv);
+  });
 }
 
-function flagReview(uuid, flag) {
-    fetch(`/userFlag/${uuid}/${flag}`)
+function flagReview(uuid, asin, flag) {
+    fetch(`/userFlag/${uuid}/${asin}/${flag}`)
         .then(res => res.json())
         .then(data => {
             if (data.status === 'flagged') {
-                alert('Review flagged!');
+                // Refresh reviews modal
+                document.getElementById(`user-flag-${uuid}`).innerHTML = `
+                    <span class="status-badge ${flag === 0 ? 'na' : flag === 1 ? 'pass' : 'fail'}">
+                      ${flag === 0 ? 'N/A' : flag === 1 ? 'Showing' : 'Hidden'}
+                    </span>
+                `;
+                document.getElementById(`action-buttons-${uuid}`).innerHTML = '-';
+            } else if (data.status === 'refresh') {
+                // Close modal & refresh products
+                bootstrap.Modal.getInstance(document.getElementById('reviewsModal')).hide();
+                fetchProducts();
+            } else {
+                alert('Failed to flag review: ' + (data.error || 'Unknown error'));
             }
         });
 }
@@ -319,15 +1398,15 @@ function importCSV() {
   const fileInput = document.getElementById('csvFile');
   const statusSpan = document.getElementById('csvStatus');
   if (!fileInput.files.length) {
-    statusSpan.textContent = 'Please select a CSV file.';
-    statusSpan.className = 'text-danger ms-3';
+    statusSpan.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Please select a CSV file.';
+    statusSpan.className = 'status-indicator status-not-checked';
     return;
   }
   const file = fileInput.files[0];
   const formData = new FormData();
   formData.append('file', file);
-  statusSpan.textContent = 'Uploading...';
-  statusSpan.className = 'text-warning ms-3';
+  statusSpan.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading and processing...';
+  statusSpan.className = 'status-indicator status-checking';
   fetch('/loadCSV', {
     method: 'POST',
     body: formData
@@ -335,20 +1414,20 @@ function importCSV() {
   .then(res => res.json())
   .then(data => {
     if (data.inserted) {
-      statusSpan.textContent = `Imported ${data.inserted} reviews.`;
-      statusSpan.className = 'text-success ms-3';
+      statusSpan.innerHTML = `<i class="fas fa-check-circle me-2"></i>Successfully imported ${data.inserted} reviews.`;
+      statusSpan.className = 'status-indicator status-done';
       fetchProducts();
     } else if (data.error) {
-      statusSpan.textContent = `Error: ${data.error}`;
-      statusSpan.className = 'text-danger ms-3';
+      statusSpan.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>Error: ${data.error}`;
+      statusSpan.className = 'status-indicator status-not-checked';
     } else {
-      statusSpan.textContent = 'Unknown response.';
-      statusSpan.className = 'text-danger ms-3';
+      statusSpan.innerHTML = '<i class="fas fa-question-circle me-2"></i>Unknown response.';
+      statusSpan.className = 'status-indicator status-not-checked';
     }
   })
   .catch(err => {
-    statusSpan.textContent = 'Upload failed.';
-    statusSpan.className = 'text-danger ms-3';
+    statusSpan.innerHTML = '<i class="fas fa-times-circle me-2"></i>Upload failed.';
+    statusSpan.className = 'status-indicator status-not-checked';
   });
 }
 
@@ -382,7 +1461,7 @@ setInterval(function() {
     // Only refresh if there are products currently being checked (check_flag 1 or 3)
     const hasActiveChecks = products.some(prod => prod.check_flag === 1 || prod.check_flag === 3);
     if (hasActiveChecks) {
-        fetchProducts();
+        fetchProducts(true); // Skip animations during automatic refresh
     }
 }, 2000); // Refresh every 2 seconds
 </script>

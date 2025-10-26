@@ -1,1 +1,2 @@
-bc3415_env/ 
+bc3415_env/
+model/model.safetensors
