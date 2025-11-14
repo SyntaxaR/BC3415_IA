@@ -1,6 +1,8 @@
 BC3415 IA — Retail Review Intelligence Demo
+==========================================
 https://www.youtube.com/watch?v=qgUEDD-lt94
 ==========================================
+
 
 Turn thousands of raw e‑commerce reviews into trustworthy product insights using a lightweight Flask app, a fine‑tuned sentiment model, and an LLM assistant for explainability and auditability.
 
